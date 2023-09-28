@@ -7,4 +7,9 @@ export class Tag {
 
   @Property()
   tag: string;
+
+
+  constructor(tag: string) {
+    this.tag = tag;
+  }
 }

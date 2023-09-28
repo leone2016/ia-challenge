@@ -20,7 +20,7 @@ const mockArticle: Article = {
   title: 'Create a new implementation',
   description: 'join the community by creating a new implementation',
   body: 'Share your knowledge and enpower the community by creating a new implementation',
-  tagList: ['implementations'],
+  tagList: 'implementations',
   createdAt: '2021-11-24T12:11:08.212Z',
   updatedAt: '2021-11-24T12:11:08.212Z',
   favorited: false,

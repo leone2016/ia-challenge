@@ -62,7 +62,6 @@ export class ArticleEditComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    debugger
     this.store.dispatch(articleEditActions.publishArticle());
   }
 

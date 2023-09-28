@@ -24,7 +24,7 @@ export const ngrxFormsFeature = createFeature({
     ngrxFormsInitialState,
     on(formsActions.setData, (state, action) => ({ ...state, data: action.data })),
     on(formsActions.updateData, (state, action) => {
-      const data = { ...state.data, ...action.data };
+      const data = { ...state.data, ...action.data};
       return { ...state, data, touched: true };
     }),
     on(formsActions.setStructure, (state, action) => ({ ...state, structure: action.structure.slice(0) })),
