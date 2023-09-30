@@ -9,6 +9,8 @@ import { IArticleRO, IArticlesRO, ICommentsRO } from './article.interface';
 import { Comment } from './comment.entity';
 import { CreateArticleDto, CreateCommentDto } from './dto';
 import {TagService} from "../tag/tag.service";
+import {UserFavorites} from "../userFavorites/userFavorites.entity";
+import {RoasterUserArticleDto} from "../userFavorites/dto/roaster-user-article.dto";
 
 @Injectable()
 export class ArticleService {
@@ -20,6 +22,8 @@ export class ArticleService {
     private readonly commentRepository: EntityRepository<Comment>,
     @InjectRepository(User)
     private readonly userRepository: EntityRepository<User>,
+    @InjectRepository(UserFavorites)
+    private readonly userFavoritesRepository: EntityRepository<UserFavorites>,
     private tagService: TagService,
   ) {}
 
@@ -179,5 +183,20 @@ export class ArticleService {
 
   async delete(slug: string) {
     return this.articleRepository.nativeDelete({ slug });
+  }
+
+
+  async findRoaster(){
+    const qb =  this.articleRepository.createQueryBuilder( 'a')
+      .select(['u.id', 'u.username'])
+      .addSelect('COUNT(DISTINCT a.id) as totalArticlesWritten')
+      .addSelect('COALESCE(COUNT(uf.article_id), 0) as totalLikesReceived ')
+      .addSelect('MIN(a.created_at) as firstArticleDate')
+      .leftJoin('a.author', 'u')
+      .leftJoin('a.userFavorites', 'uf')
+      .groupBy(['u.id', 'u.username'])
+    const result = await qb.getFormattedQuery();
+    const roaster: RoasterUserArticleDto[] =  await this.em.getConnection().execute(result)
+    return { roaster };
   }
 }

@@ -4,6 +4,7 @@ import { User } from '../user/user.decorator';
 import { IArticleRO, IArticlesRO, ICommentsRO } from './article.interface';
 import { ArticleService } from './article.service';
 import { CreateArticleDto, CreateCommentDto } from './dto';
+import {ArticleDTO} from "./article.entity";
 
 @ApiBearerAuth()
 @ApiTags('articles')
@@ -16,6 +17,12 @@ export class ArticleController {
   @Get()
   async findAll(@User('id') user: number, @Query() query: Record<string, string>): Promise<IArticlesRO> {
     return this.articleService.findAll(+user, query);
+  }
+  @ApiOperation({ summary: 'Get all Roaster Articles' })
+  @ApiResponse({ status: 200, description: 'Return all rank-ordered list of authors (based on the number of likes).' })
+  @Get("roaster")
+  async findRoasters(): Promise<any> {
+    return this.articleService.findRoaster();
   }
 
   @ApiOperation({ summary: 'Get article feed' })

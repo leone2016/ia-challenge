@@ -13,6 +13,7 @@ import slug from 'slug';
 
 import { User } from '../user/user.entity';
 import { Comment } from './comment.entity';
+import {UserFavorites} from "../userFavorites/userFavorites.entity";
 
 @Entity()
 export class Article {
@@ -48,6 +49,9 @@ export class Article {
 
   @Property({ type: 'number' })
   favoritesCount = 0;
+
+  @OneToMany(() => UserFavorites, (userFavorites) => userFavorites.article, { eager: false, orphanRemoval: true })
+  userFavorites = new Collection<UserFavorites>(this);
 
   constructor(author: User, title: string, description: string, body: string) {
     this.author = author;
