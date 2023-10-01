@@ -31,6 +31,12 @@ const structure: Field[] = [
     placeholder: 'Enter Tags',
     validator: [],
   },
+  {
+    type: 'INPUT',
+    name: 'collaboratorList',
+    placeholder: 'Enter collaborators',
+    validator: [],
+  },
 ];
 
 @UntilDestroy()

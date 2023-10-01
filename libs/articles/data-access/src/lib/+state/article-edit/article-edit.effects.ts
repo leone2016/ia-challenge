@@ -20,7 +20,8 @@ export const publishArticle$ = createEffect(
       concatMap(([_, data]) => of([_,
         {
           ...data,
-          tagList: data.tagList.split(",").map((tag:any) => tag.trim())
+          tagList: data.tagList.split(",").map((tag:any) => tag.trim()),
+          collaboratorList: data.collaboratorList?.split(",").map((author:any) => author.trim()) || []
         }])),
       concatMap(([_, data]) =>
         articlesService.publishArticle(data).pipe(

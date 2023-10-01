@@ -18,6 +18,7 @@ export const articleInitialState: ArticleState = {
     description: '',
     body: '',
     tagList: [],
+    collaboratorList: [],
     createdAt: '',
     updatedAt: '',
     favorited: false,
