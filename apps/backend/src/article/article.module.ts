@@ -10,10 +10,11 @@ import { Comment } from './comment.entity';
 import {TagModule} from "../tag/tag.module";
 import {UserFavoritesModule} from "../userFavorites/userFavorites.module";
 import {UserFavorites} from "../userFavorites/userFavorites.entity";
+import {ScheduleModule} from "@nestjs/schedule";
 
 @Module({
   controllers: [ArticleController],
-  imports: [MikroOrmModule.forFeature({ entities: [Article, Comment, User, UserFavorites] }), UserModule, TagModule, UserFavoritesModule],
+  imports: [ScheduleModule.forRoot(),MikroOrmModule.forFeature({ entities: [Article, Comment, User, UserFavorites] }), UserModule, TagModule, UserFavoritesModule],
   providers: [ArticleService],
 })
 export class ArticleModule implements NestModule {
@@ -29,6 +30,9 @@ export class ArticleModule implements NestModule {
         { path: 'articles/:slug/comments/:id', method: RequestMethod.DELETE },
         { path: 'articles/:slug/favorite', method: RequestMethod.POST },
         { path: 'articles/:slug/favorite', method: RequestMethod.DELETE },
+        { path: 'articles/:slug/lock', method: RequestMethod.POST },
+        { path: 'articles/:slug/unlock', method: RequestMethod.POST },
+        { path: 'articles/:slug/check-lock', method: RequestMethod.GET },
       );
   }
 }

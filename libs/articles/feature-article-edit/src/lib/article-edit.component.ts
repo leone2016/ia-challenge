@@ -5,6 +5,7 @@ import { Validators } from '@angular/forms';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Store } from '@ngrx/store';
 import { articleActions, articleEditActions, articleQuery } from '@realworld/articles/data-access';
+import {AsyncPipe} from "@angular/common";
 
 const structure: Field[] = [
   {
@@ -45,7 +46,7 @@ const structure: Field[] = [
   standalone: true,
   templateUrl: './article-edit.component.html',
   styleUrls: ['./article-edit.component.css'],
-  imports: [DynamicFormComponent, ListErrorsComponent],
+  imports: [DynamicFormComponent, ListErrorsComponent, AsyncPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ArticleEditComponent implements OnInit, OnDestroy {

@@ -35,10 +35,7 @@ export class ArticleController {
 
   @Get(':slug')
   async findOne(@User('id') userId: number, @Param('slug') slug: string): Promise<IArticleRO> {
-    const test = await this.articleService.findOne(userId, { slug })
-    console.log("test")
-    console.log(test)
-    return test;
+    return await this.articleService.findOne(userId, { slug })
   }
 
   @Get(':slug/comments')
@@ -110,5 +107,31 @@ export class ArticleController {
   @Delete(':slug/favorite')
   async unFavorite(@User('id') userId: number, @Param('slug') slug: string) {
     return this.articleService.unFavorite(userId, slug);
+  }
+
+  @ApiOperation({ summary: 'lock article' })
+  @ApiResponse({ status: 201, description: 'The article has been successfully locked.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @Post(':slug/lock')
+  async lockArticle( @User('id') user: number,
+                     @Param('slug') slug: string) {
+    return this.articleService.lockArticle(+user, slug);
+  }
+
+  @ApiOperation({ summary: 'Unlock article' })
+  @ApiResponse({ status: 201, description: 'The article has been successfully unlocked.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @Post(':slug/unlock')
+  async unlockArticle(@User('id') user: number,
+                      @Param('slug') slug: string) {
+    return this.articleService.unlockArticle(+user, slug);
+  }
+
+  @ApiOperation({ summary: 'Check lock status article' })
+  @ApiResponse({ status: 201, description: 'Validate status article.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @Get(':slug/check-lock')
+  async checkLockStatus( @Param('slug') slug: string) {
+    return this.articleService.checkLockStatus(slug);
   }
 }

@@ -1,39 +1,40 @@
 <div class="article-meta" >
-<!--<div *ngFor="let author of  article.authors">-->
-<!--  -->
-<!--</div>-->
-  <a [routerLink]="['/profile', article.author.username]">
-    <img [src]="article.author.image" />
+  <div *ngIf="article.islocked" class="alert alert-warning" role="alert">
+    This article is being edited by other user at this moment
+  </div>
+<div *ngFor="let author of  article.authors" class="btn-space">
+  <a [routerLink]="['/profile', author.username]" >
+    <img [src]="author.image" />
   </a>
   <div class="info">
-    <a class="author" [routerLink]="['/profile', article.author.username]">
-      {{ article.author.username }}
+    <a class="author" [routerLink]="['/profile', author.username]">
+      {{ author.username }}
     </a>
     <span class="date">{{ article.createdAt | date : 'longDate' }}</span>
   </div>
-
-  <span [hidden]="!canModify">
-    <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/editor', article.slug]">
+  <span [hidden]="!(canModify && currentUser.username === author.username)">
+    <a *ngIf="!article.islocked" class="btn btn-sm btn-outline-secondary" [routerLink]="['/editor', article.slug]">
       <i class="ion-edit"></i> Edit Article
     </a>
 
-    <button class="btn btn-sm btn-outline-danger" (click)="deleteArticle()">
+    <button class="btn btn-sm btn-outline-danger" [disabled]="article.islocked" (click)="deleteArticle()">
       <i class="ion-trash-a"></i> Delete Article
     </button>
   </span>
 
-  <span [hidden]="canModify">
+  <span [hidden]="canModify && currentUser.username === author.username">
     <button
+
       class="btn btn-sm action-btn"
       [ngClass]="{
-        'btn-outline-secondary': !article.author.following,
-        'btn-secondary': article.author.following
+        'btn-outline-secondary': !author.following,
+        'btn-secondary': author.following
       }"
       (click)="toggleFollow()"
     >
       <i class="ion-plus-round"></i>
-      &nbsp; {{ article.author.following ? 'Unfollow' : 'Follow' }}
-      {{ article.author.username }}
+      &nbsp; {{ author.following ? 'Unfollow' : 'Follow' }}
+      {{ author.username }}
     </button>
     &nbsp;&nbsp;
     <button
@@ -49,5 +50,5 @@
       <span class="counter">({{ article.favoritesCount }})</span>
     </button>
   </span>
-  [[[[
+</div>
 </div>

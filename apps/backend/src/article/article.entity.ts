@@ -60,6 +60,15 @@ export class Article {
     hidden: true })
   collaborator = new Collection<User>(this);
 
+  @Property({ type: 'date', nullable: true })
+  locked_at : Date ;
+
+  @ManyToOne({
+    entity: () => User,
+    joinColumn: 'locked_by',
+    nullable: true})
+  locked_by?: User ;
+
   constructor(author: User, title: string, description: string, body: string) {
     this.author = author;
     this.title = title;
@@ -73,11 +82,15 @@ export class Article {
     o.favorited = user && user.favorites.isInitialized() ? user.favorites.contains(this) : false;
     o.author = this.author.toJSON(user);
     o.authors = this.collaborator;
+    o.collaboratorList = this.collaborator.toArray().map(author => author.email);
+    o.islocked = !!this.locked_by
     return o;
   }
 }
 
 export interface ArticleDTO extends EntityDTO<Article> {
   favorited?: boolean;
-  authors:  Collection<User, object>
+  authors:  Collection<User, object>;
+  collaboratorList: string[];
+  islocked?: boolean;
 }

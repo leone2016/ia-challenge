@@ -40,4 +40,5 @@ export default defineConfig({
   // @ts-expect-error nestjs adapter option
   registerRequestContext: false,
   extensions: [Migrator, EntityGenerator, SeedManager],
+  allowGlobalContext: true,
 });

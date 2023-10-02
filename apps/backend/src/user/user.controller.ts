@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, Param, Post, Put, UsePipes } from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, UsePipes} from '@nestjs/common';
 import { ValidationPipe } from '../shared/pipes/validation.pipe';
 import { CreateUserDto, LoginUserDto, UpdateUserDto } from './dto';
 import { User } from './user.decorator';
@@ -41,7 +41,7 @@ export class UserController {
 
     const errors = { User: ' not found' };
     if (!foundUser) {
-      throw new HttpException({ errors }, 401);
+      throw new HttpException({ errors }, HttpStatus.UNAUTHORIZED);
     }
     const token = await this.userService.generateJWT(foundUser);
     const { email, username, bio, image } = foundUser;

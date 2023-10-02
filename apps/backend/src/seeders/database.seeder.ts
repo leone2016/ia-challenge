@@ -26,6 +26,8 @@ export class DatabaseSeeder extends Seeder {
         favoritesCount: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
+        locked_at: new Date(),
+        locked_by: authors.bennie,
       }),
       em.create(Article, {
         author: authors.zolly,
@@ -37,6 +39,8 @@ export class DatabaseSeeder extends Seeder {
         favoritesCount: 7,
         createdAt: new Date(),
         updatedAt: new Date(),
+        locked_at: new Date(),
+        locked_by: authors.bennie,
       }),
     ];
     em.persist(articles);

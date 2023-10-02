@@ -1,7 +1,7 @@
 import { Component, Input, ChangeDetectionStrategy, EventEmitter, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Article } from '@realworld/core/api-types';
+import {Article, Profile} from '@realworld/core/api-types';
 @Component({
   selector: 'cdt-article-meta',
   standalone: true,
@@ -12,6 +12,7 @@ import { Article } from '@realworld/core/api-types';
 })
 export class ArticleMetaComponent {
   @Input() article!: Article;
+  @Input() currentUser!: Profile;
   @Input() isAuthenticated!: boolean;
   @Input() canModify!: boolean;
   @Output() follow: EventEmitter<string> = new EventEmitter<string>();

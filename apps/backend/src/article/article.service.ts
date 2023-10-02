@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import {ForbiddenException, Injectable, NotFoundException} from '@nestjs/common';
 import { EntityManager, QueryOrder, wrap } from '@mikro-orm/core';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import {InjectRepository, logger} from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/mysql';
 
 import { User } from '../user/user.entity';
@@ -179,15 +179,12 @@ export class ArticleService {
     const article = await this.articleRepository.findOne({ slug }, { populate: ['author', 'collaborator'] });
     wrap(article).assign(articleWithoutCreatedAt);
     const users: User[] = await this.userRepository.find({ email: { $in: articleData.collaboratorList } } );
-    console.log(article)
     article && users.map((user: User)=> {
        if(!article.collaborator.contains(user)){
          article.collaborator.add(user)
       }
     })
-
     await this.em.flush();
-
     return { article: article!.toJSON(user!) };
   }
 
@@ -219,25 +216,77 @@ export class ArticleService {
     const roaster: RoasterUserArticleDto[] =  await this.em.getConnection().execute(result)
     return { roaster };
   }
+  async lockArticle(userId: number, slug: string,): Promise<IArticleRO | string>  {
 
-  async collaboratorUser(collaboratorList: string[], article: Article){
-    // const users: User[] = await this.userRepository.find({ email: { $in: collaboratorList } } );
-    //
-    // users.map((user: User)=> {
-    //   if(!user.collaborator.contains(article)){
-    //     user.collaborator.add(article)
-    //   }
-    // })
-  //   // const article = await this.articleRepository.findOneOrFail({ slug }, { populate: ['author'] });
-  //   // const user = await this.userRepository.findOneOrFail(id, { populate: ['favorites', 'followers'] });
-  //   //
-  //   // if (!user.favorites.contains(article)) {
-  //   //   user.favorites.add(article);
-  //   //   article.favoritesCount++;
-  //   // }
-  //
-  //   await this.em.flush();
-    return { article:  ""};
-   }
+    const article = await this.articleRepository.findOne({ slug }, { populate: ['author', 'collaborator'] });
+    if (!article) {
+      throw new NotFoundException('Article not found');
+    }
 
+    if (article.locked_by && article.locked_by.id !== userId) {
+      throw new ForbiddenException('Article is locked by another user');
+    }
+    const user = await this.userRepository.findOne(
+      { id: userId },
+      { populate: ['followers', 'favorites', 'articles'] },
+    );
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    article.locked_by = user;
+    article.locked_at = new Date();
+    await this.em.flush();
+    return { article: article!.toJSON(user!) } ;
+  }
+
+  async unlockArticle(userId: number, slug: string,): Promise<IArticleRO | string>  {
+
+    let article = await this.articleRepository.findOne({ slug }, { populate: ['author', 'collaborator'] });
+    if (!article || article.locked_by?.id !== userId)  {
+      throw new NotFoundException('Article not found or not locked by this user');
+    }
+
+    const user = await this.userRepository.findOne(
+      { id: userId },
+      { populate: ['followers', 'favorites', 'articles'] },
+    );
+
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+
+    console.log(article)
+    await this.articleRepository.createQueryBuilder()
+      .update({ locked_by: null, locked_at: null })
+      .where({id: article.id});
+    return { article: article!.toJSON(user!) } ;
+  }
+
+  async checkLockStatus(slug: string): Promise<boolean>  {
+    console.log("ingresa")
+    let message = null
+    const article = await this.articleRepository.findOne({ slug }, { populate: ['author', 'collaborator'] });
+    console.log(article)
+    if (!article) {
+      throw new NotFoundException('Article not found');
+    }
+    if (article.locked_by) {
+      const currentTimestamp = new Date().getTime();
+      const lockTimestamp = article.locked_at.getTime();
+
+      if (currentTimestamp - lockTimestamp > 5 * 60 * 1000) {  // 5 minutos
+        this.unlockArticle(article.locked_by?.id, slug);
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+
+  // @Cron('*/1 * * * *') // runs every minute
+  // async checkAndUnlockArticles() {
+  //  logger.debug("CRON JOB START");
+  //   await  this.checkLockStatus('ALL');
+  // }
 }

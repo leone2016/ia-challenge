@@ -58,9 +58,6 @@ export class User {
   @OneToMany(() => Article, (article) => article.author, { hidden: true })
   articles = new Collection<Article>(this);
 
-  // @ManyToMany({ entity: () => Article, hidden: true })
-  // collaborator = new Collection<Article>(this);
-
   constructor(username: string, email: string, password: string) {
     this.username = username;
     this.email = email;
