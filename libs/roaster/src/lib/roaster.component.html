@@ -1,30 +1,30 @@
 <div class="home-page">
-    <div class="banner">
-        <div class="container">
-            <h1 class="logo-font">Conduit Roaster</h1>
-            <p> Rank-ordered list of authors.</p>
-        </div>
+  <div class="banner">
+    <div class="container">
+      <h1 class="logo-font">Conduit Roaster</h1>
+      <p>Rank-ordered list of authors.</p>
     </div>
-    <div class="container page" *ngFor="let item of roaster$ | async">
-        <div class="row">
-            <div class="col-md-9">
-                <div class="article-preview">
-                    <div class="article-meta">
-                        <img src="http://dummyimage.com/186x100.png/5fa2dd/ffffff">
-                        <div class="info">
-                            <a data-e2e-id="article-author" class="author">
-                                {{ item.username}}
-                            </a>
-                            <span class="date">Articles: {{item.totalArticlesWritten}}</span>
-                            <span class="date">Fist Publication: {{ item.firstArticleDate | date : 'longDate' }}</span>
-                        </div>
-                        <span class="btn-sm pull-xs-right">
-                            <i class="ion-heart"></i>
-                            <div class="info">{{item.totalLikesReceived}}</div>
-                        </span>
-                    </div>
-                </div>
+  </div>
+  <div class="container page" *ngFor="let item of roaster$ | async">
+    <div class="row">
+      <div class="col-md-9">
+        <div class="article-preview">
+          <div class="article-meta">
+            <img src="http://dummyimage.com/186x100.png/5fa2dd/ffffff" />
+            <div class="info">
+              <a data-e2e-id="article-author" class="author">
+                {{ item.username }}
+              </a>
+              <span class="date">Articles: {{ item.totalArticlesWritten }}</span>
+              <span class="date">Fist Publication: {{ item.firstArticleDate | date : 'longDate' }}</span>
             </div>
+            <span class="btn-sm pull-xs-right">
+              <i class="ion-heart"></i>
+              <div class="info">{{ item.totalLikesReceived }}</div>
+            </span>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>

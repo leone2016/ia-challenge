@@ -6,7 +6,7 @@ import { ActionsService } from '../services/actions.service';
 
 export const favorite$ = createEffect(
   (actions$ = inject(Actions), actionsService = inject(ActionsService)) => {
-      return actions$.pipe(
+    return actions$.pipe(
       ofType(articlesActions.favorite),
       concatMap(({ slug }) =>
         actionsService.favorite(slug).pipe(
