@@ -63,8 +63,15 @@ export class ArticleEditComponent implements OnInit, OnDestroy {
       .subscribe((article) => this.store.dispatch(formsActions.setData({ data: article })));
   }
 
+  stringToArray(dataConvert: string| string[]):any{
+    const dataArray = typeof dataConvert == 'string' && dataConvert?.split(",").map((x:any) => x.trim())
+   return dataArray || dataConvert;
+  }
   updateForm(changes: any) {
-    this.store.dispatch(formsActions.updateData({ data: changes }));
+    const tagList =  this.stringToArray(changes.tagList)
+    const collaboratorList =  this.stringToArray(changes.collaboratorList)
+
+    this.store.dispatch(formsActions.updateData({ data: {...changes, tagList, collaboratorList} }));
   }
 
   submit() {

@@ -2,7 +2,7 @@ import {
   ArrayType,
   Collection,
   Entity,
-  EntityDTO,
+  EntityDTO, ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryKey,
@@ -14,6 +14,7 @@ import slug from 'slug';
 import { User } from '../user/user.entity';
 import { Comment } from './comment.entity';
 import {UserFavorites} from "../userFavorites/userFavorites.entity";
+import {ArticleAuthor} from "./articleAuthor.entity";
 
 @Entity()
 export class Article {
@@ -50,8 +51,14 @@ export class Article {
   @Property({ type: 'number' })
   favoritesCount = 0;
 
-  @OneToMany(() => UserFavorites, (userFavorites) => userFavorites.article, { eager: false, orphanRemoval: true })
+  @OneToMany(() => UserFavorites, (userFavorites) => userFavorites.article, { eager: false,  hidden: true })
   userFavorites = new Collection<UserFavorites>(this);
+
+  @ManyToMany({
+    entity: () => User,
+    pivotTable: 'article_author',
+    hidden: true })
+  collaborator = new Collection<User>(this);
 
   constructor(author: User, title: string, description: string, body: string) {
     this.author = author;
@@ -65,11 +72,12 @@ export class Article {
     const o = wrap<Article>(this).toObject() as ArticleDTO;
     o.favorited = user && user.favorites.isInitialized() ? user.favorites.contains(this) : false;
     o.author = this.author.toJSON(user);
-
+    o.authors = this.collaborator;
     return o;
   }
 }
 
 export interface ArticleDTO extends EntityDTO<Article> {
   favorited?: boolean;
+  authors:  Collection<User, object>
 }

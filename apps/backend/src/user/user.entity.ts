@@ -13,6 +13,7 @@ import {
 } from '@mikro-orm/core';
 import { Article } from '../article/article.entity';
 import { UserRepository } from './user.repository';
+import {ArticleAuthor} from "../article/articleAuthor.entity";
 
 @Entity({ customRepository: () => UserRepository })
 export class User {
@@ -57,6 +58,9 @@ export class User {
   @OneToMany(() => Article, (article) => article.author, { hidden: true })
   articles = new Collection<Article>(this);
 
+  // @ManyToMany({ entity: () => Article, hidden: true })
+  // collaborator = new Collection<Article>(this);
+
   constructor(username: string, email: string, password: string) {
     this.username = username;
     this.email = email;
@@ -67,7 +71,7 @@ export class User {
     const o = wrap<User>(this).toObject() as UserDTO;
     o.image = this.image || 'https://static.productionready.io/images/smiley-cyrus.jpg';
     o.following = user && user.followers.isInitialized() ? user.followers.contains(this) : false; // TODO or followed?
-
+    o.email = this.email;
     return o;
   }
 }

@@ -21,8 +21,8 @@ export class ArticleController {
   @ApiOperation({ summary: 'Get all Roaster Articles' })
   @ApiResponse({ status: 200, description: 'Return all rank-ordered list of authors (based on the number of likes).' })
   @Get("roaster")
-  async findRoasters(): Promise<any> {
-    return this.articleService.findRoaster();
+  async findRoasters( @Query() query: Record<string, string>): Promise<any> {
+    return this.articleService.findRoaster(query);
   }
 
   @ApiOperation({ summary: 'Get article feed' })
@@ -35,7 +35,10 @@ export class ArticleController {
 
   @Get(':slug')
   async findOne(@User('id') userId: number, @Param('slug') slug: string): Promise<IArticleRO> {
-    return this.articleService.findOne(userId, { slug });
+    const test = await this.articleService.findOne(userId, { slug })
+    console.log("test")
+    console.log(test)
+    return test;
   }
 
   @Get(':slug/comments')

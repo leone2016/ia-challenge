@@ -17,12 +17,6 @@ export const publishArticle$ = createEffect(
     return actions$.pipe(
       ofType(articleEditActions.publishArticle),
       concatLatestFrom(() => store.select(ngrxFormsQuery.selectData)),
-      concatMap(([_, data]) => of([_,
-        {
-          ...data,
-          tagList: data.tagList.split(",").map((tag:any) => tag.trim()),
-          collaboratorList: data.collaboratorList?.split(",").map((author:any) => author.trim()) || []
-        }])),
       concatMap(([_, data]) =>
         articlesService.publishArticle(data).pipe(
           tap((result) => router.navigate(['article', result.article.slug])),

@@ -4,7 +4,7 @@ import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/mysql';
 
 import { User } from '../user/user.entity';
-import { Article } from './article.entity';
+import {Article, ArticleDTO} from './article.entity';
 import { IArticleRO, IArticlesRO, ICommentsRO } from './article.interface';
 import { Comment } from './comment.entity';
 import { CreateArticleDto, CreateCommentDto } from './dto';
@@ -98,7 +98,8 @@ export class ArticleService {
     const user = userId
       ? await this.userRepository.findOneOrFail(userId, { populate: ['followers', 'favorites'] })
       : undefined;
-    const article = await this.articleRepository.findOne(where, { populate: ['author'] });
+    const article = await this.articleRepository.findOne(where, { populate: ['author', "collaborator"] });
+    // console.log(article.collaborator)
     return { article: article && article.toJSON(user) } as IArticleRO;
   }
 
@@ -174,8 +175,17 @@ export class ArticleService {
       { id: userId },
       { populate: ['followers', 'favorites', 'articles'] },
     );
-    const article = await this.articleRepository.findOne({ slug }, { populate: ['author'] });
-    wrap(article).assign(articleData);
+    const { createdAt, ...articleWithoutCreatedAt } = articleData;
+    const article = await this.articleRepository.findOne({ slug }, { populate: ['author', 'collaborator'] });
+    wrap(article).assign(articleWithoutCreatedAt);
+    const users: User[] = await this.userRepository.find({ email: { $in: articleData.collaboratorList } } );
+    console.log(article)
+    article && users.map((user: User)=> {
+       if(!article.collaborator.contains(user)){
+         article.collaborator.add(user)
+      }
+    })
+
     await this.em.flush();
 
     return { article: article!.toJSON(user!) };
@@ -186,7 +196,7 @@ export class ArticleService {
   }
 
 
-  async findRoaster(){
+  async findRoaster( query: Record<string, string>){
     const qb =  this.articleRepository.createQueryBuilder( 'a')
       .select(['u.id', 'u.username'])
       .addSelect('COUNT(DISTINCT a.id) as totalArticlesWritten')
@@ -195,8 +205,39 @@ export class ArticleService {
       .leftJoin('a.author', 'u')
       .leftJoin('a.userFavorites', 'uf')
       .groupBy(['u.id', 'u.username'])
+      .orderBy({ [3]: QueryOrder.DESC })
+
+    if ('limit' in query) {
+      qb.limit(+query.limit);
+    }
+
+    if ('offset' in query) {
+      qb.offset(+query.offset);
+    }
+
     const result = await qb.getFormattedQuery();
     const roaster: RoasterUserArticleDto[] =  await this.em.getConnection().execute(result)
     return { roaster };
   }
+
+  async collaboratorUser(collaboratorList: string[], article: Article){
+    // const users: User[] = await this.userRepository.find({ email: { $in: collaboratorList } } );
+    //
+    // users.map((user: User)=> {
+    //   if(!user.collaborator.contains(article)){
+    //     user.collaborator.add(article)
+    //   }
+    // })
+  //   // const article = await this.articleRepository.findOneOrFail({ slug }, { populate: ['author'] });
+  //   // const user = await this.userRepository.findOneOrFail(id, { populate: ['favorites', 'followers'] });
+  //   //
+  //   // if (!user.favorites.contains(article)) {
+  //   //   user.favorites.add(article);
+  //   //   article.favoritesCount++;
+  //   // }
+  //
+  //   await this.em.flush();
+    return { article:  ""};
+   }
+
 }
