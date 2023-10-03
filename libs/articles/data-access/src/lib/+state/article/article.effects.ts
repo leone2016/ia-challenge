@@ -133,3 +133,34 @@ export const deleteArticleSuccess$ = createEffect(
   },
   { functional: true, dispatch: false },
 );
+
+
+export const lockArticle$ = createEffect(
+  (actions$ = inject(Actions), articlesService = inject(ArticlesService)) => {
+    return actions$.pipe(
+      ofType(articleActions.lockArticle),
+      concatMap((action) =>
+        articlesService.lockArticle(action.slug).pipe(
+          map((response) => articleActions.loadArticleSuccess({ article: response.article })),
+          catchError((error) => of(articleActions.loadArticleFailure(error))),
+        ),
+      ),
+    );
+  },
+  { functional: true },
+);
+
+export const unlockArticle$ = createEffect(
+  (actions$ = inject(Actions), articlesService = inject(ArticlesService)) => {
+    return actions$.pipe(
+      ofType(articleActions.unlockArticle),
+      concatMap((action) =>
+        articlesService.unLockArticle(action.slug).pipe(
+          map((response) => articleActions.loadArticleSuccess({ article: response.article })),
+          catchError((error) => of(articleActions.loadArticleFailure(error))),
+        ),
+      ),
+    );
+  },
+  { functional: true },
+);

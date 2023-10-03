@@ -126,7 +126,7 @@ export class ArticleService {
   }
 
   async favorite(id: number, slug: string): Promise<IArticleRO> {
-    const article = await this.articleRepository.findOneOrFail({ slug }, { populate: ['author'] });
+    const article = await this.articleRepository.findOneOrFail({ slug }, { populate: ['author', 'collaborator'] });
     const user = await this.userRepository.findOneOrFail(id, { populate: ['favorites', 'followers'] });
 
     if (!user.favorites.contains(article)) {
@@ -139,7 +139,7 @@ export class ArticleService {
   }
 
   async unFavorite(id: number, slug: string): Promise<IArticleRO> {
-    const article = await this.articleRepository.findOneOrFail({ slug }, { populate: ['author'] });
+    const article = await this.articleRepository.findOneOrFail({ slug }, { populate: ['author', 'collaborator'] });
     const user = await this.userRepository.findOneOrFail(id, { populate: ['followers', 'favorites'] });
 
     if (user.favorites.contains(article)) {
@@ -175,9 +175,9 @@ export class ArticleService {
       { id: userId },
       { populate: ['followers', 'favorites', 'articles'] },
     );
-    const { createdAt, ...articleWithoutCreatedAt } = articleData;
+    const { createdAt, locked_at,...updateArticle } = articleData;
     const article = await this.articleRepository.findOne({ slug }, { populate: ['author', 'collaborator'] });
-    wrap(article).assign(articleWithoutCreatedAt);
+    wrap(article).assign(updateArticle);
     const users: User[] = await this.userRepository.find({ email: { $in: articleData.collaboratorList } } );
     article && users.map((user: User)=> {
        if(!article.collaborator.contains(user)){
@@ -275,7 +275,7 @@ export class ArticleService {
       const lockTimestamp = article.locked_at.getTime();
 
       if (currentTimestamp - lockTimestamp > 5 * 60 * 1000) {  // 5 minutos
-        this.unlockArticle(article.locked_by?.id, slug);
+        await this.unlockArticle(article.locked_by.id, slug);
         return false;
       }
       return true;

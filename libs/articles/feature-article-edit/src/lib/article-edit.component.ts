@@ -1,11 +1,13 @@
 import { DynamicFormComponent, Field, formsActions, ListErrorsComponent, ngrxFormsQuery } from '@realworld/core/forms';
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, OnInit} from '@angular/core';
 import { OnDestroy } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Store } from '@ngrx/store';
 import { articleActions, articleEditActions, articleQuery } from '@realworld/articles/data-access';
 import {AsyncPipe} from "@angular/common";
+import {ActivatedRoute, ActivatedRouteSnapshot, ResolveFn} from "@angular/router";
+import {Article} from "@realworld/core/api-types";
 
 const structure: Field[] = [
   {
@@ -52,16 +54,19 @@ const structure: Field[] = [
 export class ArticleEditComponent implements OnInit, OnDestroy {
   structure$ = this.store.select(ngrxFormsQuery.selectStructure);
   data$ = this.store.select(ngrxFormsQuery.selectData);
+  data: any = {};
 
   constructor(private readonly store: Store) {}
 
   ngOnInit() {
     this.store.dispatch(formsActions.setStructure({ structure }));
-
     this.store
       .select(articleQuery.selectData)
       .pipe(untilDestroyed(this))
-      .subscribe((article) => this.store.dispatch(formsActions.setData({ data: article })));
+      .subscribe((article:Article) => {
+        this.data = article;
+        this.store.dispatch(formsActions.setData({ data: article }))
+      });
   }
 
   stringToArray(dataConvert: string| string[]):any{
@@ -81,5 +86,6 @@ export class ArticleEditComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.store.dispatch(formsActions.initializeForm());
+    this.data.slug && this.store.dispatch(articleActions.unlockArticle({ slug: this.data.slug }));
   }
 }

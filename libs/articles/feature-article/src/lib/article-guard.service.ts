@@ -18,6 +18,7 @@ export class ArticleGuardService implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
     const slug = route.params['slug'];
+    console.log("INgresa")
     this.store.dispatch(articleActions.loadArticle({ slug }));
 
     return this.waitForArticleToLoad().pipe(tap(() => this.store.dispatch(articleActions.loadComments({ slug }))));

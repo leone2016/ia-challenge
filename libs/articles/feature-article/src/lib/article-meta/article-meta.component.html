@@ -30,7 +30,7 @@
         'btn-outline-secondary': !author.following,
         'btn-secondary': author.following
       }"
-      (click)="toggleFollow()"
+      (click)="toggleFollow(author)"
     >
       <i class="ion-plus-round"></i>
       &nbsp; {{ author.following ? 'Unfollow' : 'Follow' }}

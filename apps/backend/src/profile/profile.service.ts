@@ -51,6 +51,8 @@ export class ProfileService {
   }
 
   async follow(followerEmail: string, username: string): Promise<IProfileRO> {
+
+    console.log(followerEmail, username)
     if (!followerEmail || !username) {
       throw new HttpException('Follower email and username not provided.', HttpStatus.BAD_REQUEST);
     }

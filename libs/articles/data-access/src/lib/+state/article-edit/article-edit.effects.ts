@@ -6,6 +6,7 @@ import { formsActions, ngrxFormsQuery } from '@realworld/core/forms';
 import { catchError, concatMap, map, of, tap } from 'rxjs';
 import { ArticlesService } from '../../services/articles.service';
 import { articleEditActions } from './article-edit.actions';
+import {articleActions} from "@realworld/articles/data-access/src";
 
 export const publishArticle$ = createEffect(
   (
@@ -21,6 +22,7 @@ export const publishArticle$ = createEffect(
         articlesService.publishArticle(data).pipe(
           tap((result) => router.navigate(['article', result.article.slug])),
           map(() => articleEditActions.publishArticleSuccess()),
+          tap(() => data.slug && store.dispatch(articleActions.unlockArticle({ slug: data.slug }))),
           catchError((result) => of(formsActions.setErrors({ errors: result.error.errors }))),
         ),
       ),
@@ -28,3 +30,4 @@ export const publishArticle$ = createEffect(
   },
   { functional: true },
 );
+

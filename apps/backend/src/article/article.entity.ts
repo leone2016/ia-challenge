@@ -60,7 +60,7 @@ export class Article {
     hidden: true })
   collaborator = new Collection<User>(this);
 
-  @Property({ type: 'date', nullable: true })
+  @Property({ type: 'date', nullable: true , default: null})
   locked_at : Date ;
 
   @ManyToOne({

@@ -29,11 +29,11 @@ export class ArticleMetaComponent {
     }
   }
 
-  toggleFollow() {
-    if (this.article.author.following) {
-      this.unfollow.emit(this.article.author.username);
+  toggleFollow(author: Profile) {
+    if (author.following) {
+      this.unfollow.emit(author.username);
     } else {
-      this.follow.emit(this.article.author.username);
+      this.follow.emit(author.username);
     }
   }
 

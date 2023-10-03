@@ -26,5 +26,7 @@ export const articleActions = createActionGroup({
     deleteComment: props<{ commentId: number; slug: string }>(),
     deleteCommentFailure: props<{ error: Error }>(),
     deleteCommentSuccess: props<{ commentId: number }>(),
+    lockArticle: props<{ slug: string }>(),
+    unlockArticle: props<{ slug: string }>(),
   },
 });
