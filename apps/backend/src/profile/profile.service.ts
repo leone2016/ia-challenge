@@ -68,7 +68,7 @@ export class ProfileService {
     if (!followingUser || !followerUser) {
       throw new HttpException('Users cannot be found.', HttpStatus.BAD_REQUEST);
     }
-
+console.log(followingUser.email, followerEmail)
     if (followingUser.email === followerEmail) {
       throw new HttpException('FollowerEmail and FollowingId cannot be equal.', HttpStatus.BAD_REQUEST);
     }
