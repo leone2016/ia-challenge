@@ -65,6 +65,7 @@ export class ArticleEditComponent implements OnInit, OnDestroy {
       .pipe(untilDestroyed(this))
       .subscribe((article:Article) => {
         this.data = article;
+
         this.store.dispatch(formsActions.setData({ data: article }))
       });
   }

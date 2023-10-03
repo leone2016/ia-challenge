@@ -67,6 +67,13 @@ export class User {
   toJSON(user?: User) {
     const o = wrap<User>(this).toObject() as UserDTO;
     o.image = this.image || 'https://static.productionready.io/images/smiley-cyrus.jpg';
+    console.log(user)
+    "======================="
+    console.log(user?.followers.isInitialized())
+    console.log("user?.followers.contains(this)")
+    console.log(user?.followers.contains(this))
+    console.log("=======================")
+    console.log(this)
     o.following = user && user.followers.isInitialized() ? user.followers.contains(this) : false; // TODO or followed?
     o.email = this.email;
     return o;
